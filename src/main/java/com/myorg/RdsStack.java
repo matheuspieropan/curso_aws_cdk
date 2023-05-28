@@ -18,7 +18,7 @@ public class RdsStack extends Stack {
     public RdsStack(final Construct scope, final String id, final StackProps props, Vpc vpc) {
         super(scope, id, props);
 
-        CfnParameter dataBasePassword = CfnParameter.Builder.create(this, "dataBasePassword").
+        CfnParameter databasePassword = CfnParameter.Builder.create(this, "databasePassword").
                 type("String").build();
 
         ISecurityGroup iSecurityGroup = SecurityGroup.fromSecurityGroupId(this, id, vpc.getVpcDefaultSecurityGroup());
@@ -33,7 +33,7 @@ public class RdsStack extends Stack {
                 .vpc(vpc)
                 .credentials(Credentials.fromUsername("admin",
                         CredentialsFromUsernameOptions.builder()
-                                .password(SecretValue.plainText(dataBasePassword.getValueAsString()))
+                                .password(SecretValue.plainText(databasePassword.getValueAsString()))
                                 .build()))
                 .instanceType(InstanceType.of(InstanceClass.BURSTABLE2, InstanceSize.MICRO))
                 .multiAz(false)
@@ -51,7 +51,7 @@ public class RdsStack extends Stack {
 
         CfnOutput.Builder.create(this, "rds-password")
                 .exportName("rds-password")
-                .value(databaseInstance.toString())
+                .value(databasePassword.getValueAsString())
                 .build();
     }
 
