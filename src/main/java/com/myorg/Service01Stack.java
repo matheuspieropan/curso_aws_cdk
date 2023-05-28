@@ -27,6 +27,8 @@ public class Service01Stack extends Stack {
                 + ":3306/aws_project01?createDatabaseIfNotExist=true&allowPublicKeyRetrieval=true");
         envVariables.put("SPRING_DATASOURCE_USERNAME", "admin");
         envVariables.put("SPRING_DATASOURCE_PASSWORD", Fn.importValue("rds-password"));
+        envVariables.put("aws.region", "us-east-1");
+        envVariables.put("aws.sns.topic.product.events.arn", snsTopic.getTopic().getTopicArn());
 
         ApplicationLoadBalancedFargateService service = ApplicationLoadBalancedFargateService.
                 Builder.create(this, "ALB-01").
