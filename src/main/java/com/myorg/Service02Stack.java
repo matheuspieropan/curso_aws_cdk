@@ -50,7 +50,7 @@ public class Service02Stack extends Stack {
 
         Map<String, String> envVariables = new HashMap<>();
         envVariables.put("aws.region", "us-east-1");
-        envVariables.put("AWS_SQS_PRODUTO_QUEUE", producoEvents.getQueueName());
+        envVariables.put("aws.sqs.queue.product.events.name", producoEvents.getQueueName());
 
         ApplicationLoadBalancedFargateService service = ApplicationLoadBalancedFargateService.
                 Builder.create(this, "ALB-02").
