@@ -5,11 +5,13 @@ import software.amazon.awscdk.RemovalPolicy;
 import software.amazon.awscdk.Stack;
 import software.amazon.awscdk.StackProps;
 import software.amazon.awscdk.services.applicationautoscaling.EnableScalingProps;
+import software.amazon.awscdk.services.dynamodb.Table;
 import software.amazon.awscdk.services.ecs.*;
 import software.amazon.awscdk.services.ecs.patterns.ApplicationLoadBalancedFargateService;
 import software.amazon.awscdk.services.ecs.patterns.ApplicationLoadBalancedTaskImageOptions;
 import software.amazon.awscdk.services.elasticloadbalancingv2.HealthCheck;
 import software.amazon.awscdk.services.events.targets.SnsTopic;
+import software.amazon.awscdk.services.iam.IRole;
 import software.amazon.awscdk.services.logs.LogGroup;
 import software.amazon.awscdk.services.sns.subscriptions.SqsSubscription;
 import software.amazon.awscdk.services.sqs.DeadLetterQueue;
@@ -21,11 +23,11 @@ import java.util.Map;
 
 public class Service02Stack extends Stack {
 
-    public Service02Stack(final Construct scope, final String id, Cluster cluster, SnsTopic topic) {
-        this(scope, id, null, cluster, topic);
+    public Service02Stack(final Construct scope, final String id, Cluster cluster, SnsTopic topic, Table table) {
+        this(scope, id, null, cluster, topic, table);
     }
 
-    public Service02Stack(final Construct scope, final String id, final StackProps props, Cluster cluster, SnsTopic topic) {
+    public Service02Stack(final Construct scope, final String id, final StackProps props, Cluster cluster, SnsTopic topic, Table table) {
         super(scope, id, props);
 
         Queue producoEventsDlq = Queue.Builder.create(this, "ProducoEventsDlq")
@@ -81,6 +83,8 @@ public class Service02Stack extends Stack {
                 .targetUtilizationPercent(50).scaleInCooldown(Duration.seconds(60))
                 .scaleOutCooldown(Duration.seconds(60)).build());
 
-        producoEvents.grantConsumeMessages(service.getTaskDefinition().getTaskRole());
+        IRole taskRole = service.getTaskDefinition().getTaskRole();
+        producoEvents.grantConsumeMessages(taskRole);
+        table.grantReadWriteData(taskRole);
     }
 }
