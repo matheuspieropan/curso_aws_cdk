@@ -19,19 +19,23 @@ public class DynamodbStack extends Stack {
 
     public DynamodbStack(final Construct scope, final String id, final StackProps props) {
         super(scope, id, props);
-        produtoDynamoDb = Table.Builder.create(this, "produtoDynamoDb")
-                .tableName("produtos-eventos")
+        produtoDynamoDb = Table.Builder.create(this, "ProductEventsDb")
+                .tableName("product-events")
                 .billingMode(BillingMode.PROVISIONED)
                 .readCapacity(1)
                 .writeCapacity(1)
                 .partitionKey(Attribute.builder()
-                        .name("")
+                        .name("pk")
                         .type(AttributeType.STRING)
                         .build())
+                .sortKey(Attribute.builder()
+                        .name("sk")
+                        .type(AttributeType.STRING)
+                        .build())
+                .timeToLiveAttribute("ttl")
                 .removalPolicy(RemovalPolicy.DESTROY)
                 .build();
     }
-
     public Table getProdutoDynamoDb() {
         return produtoDynamoDb;
     }
